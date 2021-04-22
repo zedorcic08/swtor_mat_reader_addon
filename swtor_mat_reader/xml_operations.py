@@ -35,17 +35,16 @@ def get_shader_info(filename):
 
     for data_node in data_root:
         if data_node.tag == 'input':
-            for sub_node in data_node:
-                if sub_node.text == 'DiffuseMap':
-                    diffuse_path = data_node[2].text
-                elif sub_node.text == 'RotationMap1':
-                    normal_path = data_node[2].text
-                elif sub_node.text == 'GlossMap':
-                    specular_path = data_node[2].text
-                elif sub_node.text == 'UsesReflection':
-                    uses_reflective = eval(data_node[2].text)
-                elif sub_node.text == 'UsesEmissive':
-                    uses_emissive = eval(data_node[2].text)
+            if data_node[0].text == 'DiffuseMap':
+                diffuse_path = data_node[2].text
+            elif data_node[0].text == 'RotationMap1':
+                normal_path = data_node[2].text
+            elif data_node[0].text == 'GlossMap':
+                specular_path = data_node[2].text
+            elif data_node[0].text == 'UsesReflection':
+                uses_reflective = eval(data_node[2].text)
+            elif data_node[0].text == 'UsesEmissive':
+                uses_emissive = eval(data_node[2].text)
 
     diffuse_list = diffuse_path.split('\\')
     normal_list = normal_path.split('\\')
@@ -66,8 +65,5 @@ def material_search(material_name, work_dir):
         if isinstance(file_name, str):
             entry_path = find_file(work_dir,file_name,'texture')
             return(entry_path)  # Returning entry path for now, need to work out Blender file manipulation
-
-if __name__ == "__main__":
-    main()
 
 
