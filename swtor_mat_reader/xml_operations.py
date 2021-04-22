@@ -4,22 +4,70 @@ import os
 import fnmatch
 import xml.etree.ElementTree as xml_tree
 
-
-def find_file(working_dir,filename,filetype):
-
 # Function to find files across a given directory.
-# Takes: directory path, file name, file type
+# Input: directory path, file name, file type
+# Output: list of material components (reading from shader) or file path to texture
 # File type is either 'shader' or 'texture'
 
-    for root, dir_list, file_list in os.walk(working_dir, topdown=False):
+
+def find_file(working_dir, file_name, filetype):
+
+  for root, dir_list, file_list in os.walk(working_dir, topdown=False):
         if filetype == 'shader':
             for entry in file_list:
-                if fnmatch.fnmatch(entry, shader_name + '.mat'):
-                    components = get_shader_info(root+entry)
+                if fnmatch.fnmatch(entry, file_name + '.mat'):
+                    components = get_shader_info(root + '\\' + entry)
+                    return(components)
+        if filetype == 'texture':
+            for entry in file_list:
+                if fnmatch.fnmatch(entry, file_name + '.dds'):
+                    return root + '\\' + entry
+
+
+# Open the MAT file and read the contents to grab the Diffuse, Normal and Specular files.
+# Return a list with the file names and whether Emissive and Reflective are used in the shader
 
 
 def get_shader_info(filename):
 
     data_tree = xml_tree.parse(filename)
+    data_root = data_tree.getroot()
+
+    for data_node in data_root:
+        if data_node.tag == 'input':
+            for sub_node in data_node:
+                if sub_node.text == 'DiffuseMap':
+                    diffuse_path = data_node[2].text
+                elif sub_node.text == 'RotationMap1':
+                    normal_path = data_node[2].text
+                elif sub_node.text == 'GlossMap':
+                    specular_path = data_node[2].text
+                elif sub_node.text == 'UsesReflection':
+                    uses_reflective = eval(data_node[2].text)
+                elif sub_node.text == 'UsesEmissive':
+                    uses_emissive = eval(data_node[2].text)
+
+    diffuse_list = diffuse_path.split('\\')
+    normal_list = normal_path.split('\\')
+    specular_list = specular_path.split('\\')
+
+    diffuse = diffuse_list[len(diffuse_list)-1]
+    normal = normal_list[len(normal_list)-1]
+    specular = specular_list[len(specular_list)-1]
+
+    return [diffuse, normal, specular, uses_emissive, uses_reflective]
+
+
+def material_search(material_name, work_dir):
+
+    component_list = find_file(work_dir, material_name,'shader')
+
+    for file_name in component_list:
+        if isinstance(file_name, str):
+            entry_path = find_file(work_dir,file_name,'texture')
+            return(entry_path)  # Returning entry path for now, need to work out Blender file manipulation
+
+if __name__ == "__main__":
+    main()
 
 
