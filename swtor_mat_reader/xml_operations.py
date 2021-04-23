@@ -13,16 +13,24 @@ import xml.etree.ElementTree as xml_tree
 
 def find_file(working_dir, file_name, filetype):
 
-  for root, dir_list, file_list in os.walk(working_dir, topdown=False):
-        if filetype == 'shader':
-            for entry in file_list:
-                if fnmatch.fnmatch(entry, file_name + '.mat'):
-                    components = get_shader_info(root + '\\' + entry)
-                    return(components)
-        if filetype == 'texture':
-            for entry in file_list:
-                if fnmatch.fnmatch(entry, file_name + '.dds'):
-                    return root + '\\' + entry
+    if os.path.exists(working_dir):
+        for root, dir_list, file_list in os.walk(working_dir, topdown=False):
+            if filetype == 'shader':
+                for entry in file_list:
+                    if fnmatch.fnmatch(entry, file_name + '.mat'):
+                        components = get_shader_info(root + '\\' + entry)
+                        return components
+                print('No file found.')
+                return None  # Should return None only if it runs through all the files and not find a match
+            if filetype == 'texture':
+                for entry in file_list:
+                    if fnmatch.fnmatch(entry, file_name + '.dds'):
+                        return root + '\\' + entry
+                    print('No file found.')
+                    return None  # Should return None only if it runs through all the files and not find a match
+    else:
+        print('Directory does not exist.')
+        return None
 
 
 # Open the MAT file and read the contents to grab the Diffuse, Normal and Specular files.
