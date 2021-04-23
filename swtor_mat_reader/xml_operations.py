@@ -4,6 +4,7 @@ import os
 import fnmatch
 import xml.etree.ElementTree as xml_tree
 
+
 # Function to find files across a given directory.
 # Input: directory path, file name, file type
 # Output: list of material components (reading from shader) or file path to texture
