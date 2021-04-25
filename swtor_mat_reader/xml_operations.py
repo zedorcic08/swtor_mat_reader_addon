@@ -14,20 +14,23 @@ import xml.etree.ElementTree as xml_tree
 def find_file(working_dir, file_name, filetype):
 
     if os.path.exists(working_dir):
+        print("File directory found. Starting file search...")
+
         for root, dir_list, file_list in os.walk(working_dir, topdown=False):
-            if filetype == 'shader':
+
+            if filetype == "shader":
                 for entry in file_list:
-                    if fnmatch.fnmatch(entry, file_name + '.mat'):
-                        components = get_shader_info(root + '\\' + entry)
+                    if fnmatch.fnmatch(entry, file_name + ".mat"):
+                        print("Shader found. Starting shader read...")
+                        components = get_shader_info(root + "\\" + entry)
+                        print("Components found.")
                         return components
-                print('No file found.')
-                return None  # Should return None only if it runs through all the files and not find a match
-            if filetype == 'texture':
+
+            if filetype == "texture":
                 for entry in file_list:
-                    if fnmatch.fnmatch(entry, file_name + '.dds'):
+                    if fnmatch.fnmatch(entry, file_name + ".dds"):
+                        print("Texture " + entry + " found.")
                         return root + '\\' + entry
-                    print('No file found.')
-                    return None  # Should return None only if it runs through all the files and not find a match
     else:
         print('Directory does not exist.')
         return None
@@ -64,15 +67,5 @@ def get_shader_info(filename):
     specular = specular_list[len(specular_list)-1]
 
     return [diffuse, normal, specular, uses_emissive, uses_reflective]
-
-
-def material_search(material_name, work_dir):
-
-    component_list = find_file(work_dir, material_name,'shader')
-
-    for file_name in component_list:
-        if isinstance(file_name, str):
-            entry_path = find_file(work_dir,file_name,'texture')
-            return(entry_path)  # Returning entry path for now, need to work out Blender file manipulation
 
 

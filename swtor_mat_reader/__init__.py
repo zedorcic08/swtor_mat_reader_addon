@@ -106,17 +106,29 @@ class ObjectLinkMaterials(bpy.types.Operator):
                 # Poll materials in an object
                 for mat in obj.material_slots:
                     mat.material.use_nodes = True
+
                     component_list = xml_operations.find_file(work_dir, mat.name ,'shader')
                     if component_list is not None:
+
                         diffuse_path = xml_operations.find_file(work_dir,component_list[0], 'texture')
                         if diffuse_path is not None:
                             self.connect_diffuse(mat, diffuse_path)
+                        else:
+                            print("No diffuse texture found.")
+
                         normal_path = xml_operations.find_file(work_dir, component_list[1], 'texture')
                         if normal_path is not None:
                             self.connect_normal(mat, normal_path)
+                        else:
+                            print("No normal texture found.")
+
                         specular_path = xml_operations.find_file(work_dir, component_list[2], 'texture')
                         if specular_path is not None:
                             self.connect_specular(mat, specular_path)
+                        else:
+                            print("No specular texture found.")
+                    else:
+                        print(" No shader found. ")
 
         return {'FINISHED'}  # Lets Blender know the operator finished successfully.
 
