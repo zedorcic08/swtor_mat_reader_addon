@@ -107,23 +107,32 @@ class ObjectLinkMaterials(bpy.types.Operator):
                     if component_list is not None:
                         print("Linking textures... ")
 
-                        diffuse_path = search_op.find_file(work_dir, component_list[0], 'texture')
-                        if diffuse_path is not None:
-                            self.connect_diffuse(mat, diffuse_path, component_list[0])
+                        if component_list[0] is not None:
+                            diffuse_path = search_op.find_file(work_dir, component_list[0], 'texture')
+                            if diffuse_path is not None:
+                                self.connect_diffuse(mat, diffuse_path, component_list[0])
+                            else:
+                                print("No diffuse texture found.")
                         else:
-                            print("No diffuse texture found.")
+                            print("No diffuse data.")
 
-                        normal_path = search_op.find_file(work_dir, component_list[1], 'texture')
-                        if normal_path is not None:
-                            self.connect_normal(mat, normal_path, component_list[1])
+                        if component_list[1] is not None:
+                            normal_path = search_op.find_file(work_dir, component_list[1], 'texture')
+                            if normal_path is not None:
+                                self.connect_normal(mat, normal_path, component_list[1])
+                            else:
+                                print("No normal texture found.")
                         else:
-                            print("No normal texture found.")
+                            print("No normal data.")
 
-                        specular_path = search_op.find_file(work_dir, component_list[2], 'texture')
-                        if specular_path is not None:
-                            self.connect_specular(mat, specular_path, component_list[2])
+                        if component_list[2] is not None:
+                            specular_path = search_op.find_file(work_dir, component_list[2], 'texture')
+                            if specular_path is not None:
+                                self.connect_specular(mat, specular_path, component_list[2])
+                            else:
+                                print("No specular texture found.")
                         else:
-                            print("No specular texture found.")
+                            print("No specular data found.")
                     else:
                         print(" No shader found. ")
 
