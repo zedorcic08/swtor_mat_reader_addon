@@ -46,6 +46,13 @@ def get_shader_info(filename):
     data_tree = xml_tree.parse(filename)
     data_root = data_tree.getroot()
 
+    # Initialize path values to None as default
+    diffuse_path = None
+    normal_path = None
+    specular_path = None
+    uses_reflective = None
+    uses_emissive = None
+
     for data_node in data_root:
         if data_node.tag == 'input':
             if data_node[0].text == 'DiffuseMap':
@@ -59,13 +66,27 @@ def get_shader_info(filename):
             elif data_node[0].text == 'UsesEmissive':
                 uses_emissive = eval(data_node[2].text)
 
-    diffuse_list = diffuse_path.split('\\')
-    normal_list = normal_path.split('\\')
-    specular_list = specular_path.split('\\')
 
-    diffuse = diffuse_list[len(diffuse_list)-1]
-    normal = normal_list[len(normal_list)-1]
-    specular = specular_list[len(specular_list)-1]
+    if diffuse_path is not None:
+        diffuse_list = diffuse_path.split('\\')
+        diffuse = diffuse_list[len(diffuse_list) - 1]
+    else:
+        diffuse = None
+        print("No diffuse data found in the shader file.")
+
+    if normal_path is not None:
+        normal_list = normal_path.split('\\')
+        normal = normal_list[len(normal_list) - 1]
+    else:
+        normal = None
+        print("No normal data found in the shader file.")
+
+    if specular_path is not None:
+        specular_list = specular_path.split('\\')
+        specular = specular_list[len(specular_list)-1]
+    else:
+        specular = None
+        print("No specular data found in the shader file.")
 
     return [diffuse, normal, specular, uses_emissive, uses_reflective]
 
