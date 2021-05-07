@@ -16,7 +16,7 @@ class ObjectLinkUberItemMaterial(bpy.types.Operator):
         material_name = mat.material.name
         material_data = mat.material
         print("--------------------")
-        print("Processing material: " + material_name)
+        print("Copying template for: " + material_name)
 
         if "Principled BSDF" in material_data.node_tree.nodes:
             print("Deleting default shader...")
@@ -83,7 +83,14 @@ class ObjectLinkUberItemMaterial(bpy.types.Operator):
                 for mat in obj.material_slots:
                     mat.material.use_nodes = True
 
-                    component_list = search_op.find_file(work_dir, mat.name, 'shader')
+                    # Provision against copied materials: material name will always end up as 'name'+'.00x'
+                    # At the start of the iteration, pull the actual name from the string
+                    material_name = mat.name.split(".")[0]
+                    print("--------------------")
+                    print("Processing " + material_name + ".")
+                    print("--------------------")
+
+                    component_list = search_op.find_file(work_dir, material_name, 'shader')
                     if component_list is not None:
                         print("Creating material template...")
                         self.create_material_from_template(mat)
