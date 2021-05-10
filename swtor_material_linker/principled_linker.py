@@ -96,7 +96,7 @@ class ObjectLinkMaterials(bpy.types.Operator):
         work_dir = context.preferences.addons[__package__].preferences.dirpath
         for obj in context.scene.objects:
             # Ignore camera and light objects
-            if ("camera" not in obj.name.lower()) and ("light" not in obj.name.lower()):
+            if obj.type not in ['CAMERA', 'LIGHT']:
                 # Poll materials in an object
                 for mat in obj.material_slots:
                     mat.material.use_nodes = True
@@ -136,5 +136,6 @@ class ObjectLinkMaterials(bpy.types.Operator):
                     else:
                         print(" No shader found. ")
 
+        print("--------------------")
         return {'FINISHED'}  # Lets Blender know the operator finished successfully.
 
