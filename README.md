@@ -1,6 +1,3 @@
-# swtor_mat_reader_addon
-Python addon to read MAT files when importing an object in Blender
-
 # SWTOR Material Linker
 
 This add-on helps to automatically link a SWTOR model to its approprate textures, automatically adding the node set used for generic materials and populating it with the texture files found in the shader files. 
