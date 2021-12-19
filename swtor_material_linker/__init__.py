@@ -9,7 +9,7 @@ from . import uber_linker
 bl_info = {
     "name": "SWTOR Material Linker",
     "author": "Silver Ranger",
-    'version': (1, 1, 0),
+    'version': (1, 2, 0),
     "blender": (2, 80, 0),
     "category": "Import-Export",
 }
@@ -37,8 +37,9 @@ class OBJECT_MT_SubMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
 
-        layout.operator("object.material_match", text="Item - Principled Shader")
-        layout.operator("object.uber_match", text="Item - Uber Material")
+        layout.operator("object.material_match", text="Scene - Principled Shader")
+        layout.operator("object.uber_scene_match", text="Scene - Uber Material")
+        layout.operator("object.uber_active_match", text="Selected item - Uber Material")
 
 
 class OBJECT_MT_MainMenu(bpy.types.Menu):
@@ -55,7 +56,8 @@ class OBJECT_MT_MainMenu(bpy.types.Menu):
 def register():
     bpy.utils.register_class(LinkerAddonPreferences)
     bpy.utils.register_class(principled_linker.ObjectLinkMaterials)
-    bpy.utils.register_class(uber_linker.ObjectLinkUberItemMaterial)
+    bpy.utils.register_class(uber_linker.ObjectSceneUberLinker)
+    bpy.utils.register_class(uber_linker.ObjectActiveUberLinker)
     bpy.utils.register_class(OBJECT_MT_SubMenu)
     bpy.utils.register_class(OBJECT_MT_MainMenu)
     bpy.types.NODE_MT_context_menu.append(OBJECT_MT_MainMenu.draw)
@@ -65,6 +67,7 @@ def unregister():
     bpy.types.NODE_MT_context_menu.remove(OBJECT_MT_MainMenu.draw)
     bpy.utils.unregister_class(OBJECT_MT_MainMenu)
     bpy.utils.unregister_class(OBJECT_MT_SubMenu)
-    bpy.utils.unregister_class(uber_linker.ObjectLinkUberItemMaterial)
+    bpy.utils.unregister_class(uber_linker.ObjectActiveUberLinker)
+    bpy.utils.unregister_class(uber_linker.ObjectSceneUberLinker)
     bpy.utils.unregister_class(principled_linker.ObjectLinkMaterials)
     bpy.utils.unregister_class(LinkerAddonPreferences)

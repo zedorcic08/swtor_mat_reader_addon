@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import bpy
 import os
 import fnmatch
 import json
@@ -90,16 +91,69 @@ def get_shader_info(filename):
 
     return [diffuse, normal, specular, uses_emissive, uses_reflective]
 
-# Open the assets.json file created by the Character Creator
-# Returns files associated with a specific model and the accompanying parameters
 
-def get_xml_info(file_name, model_name, shader_type):
+def create_material_from_template(mat):
+    # Fetch Principled BDSF node and delete it
+    material_name = mat.material.name
+    material_data = mat.material
+    print("--------------------")
+    print("Copying template for: " + material_name)
 
-    with open(file_name, 'r') as json_file:
-        json_data = json.load(json_file)
+    if "Principled BSDF" in material_data.node_tree.nodes:
+        print("Deleting default shader...")
+        principled_node = mat.material.node_tree.nodes["Principled BSDF"]
+        mat.material.node_tree.nodes.remove(principled_node)
+    else:
+        print("Principled Shader not present.")
 
-        for data_line in json_data :
-            print(json.dumps(data_line, ident=2))
+    # Get Uber template and copy it to current material
+    print("Copying template...")
+    if "Template: Uber Shader" in bpy.data.materials:
+        shader_template = bpy.data.materials["Template: Uber Shader"]
+        mat.material = shader_template.copy()
+        mat.material.name = material_name
+        print("Template name: " + mat.material.name)
+        print("Template set.")
+        print("--------------------")
+    else:
+        print("Template not found.")
+
+
+def connect_diffuse(mat, diffuse_path, diffuse_name):
+    #0 Fetch Diffuse node and connect file
+    if "_d DiffuseMap" in mat.material.node_tree.nodes:
+        diffuse_node = mat.material.node_tree.nodes["_d DiffuseMap"]
+        if diffuse_name + ".dds" not in bpy.data.images:
+            diffuse_node.image = bpy.data.images.load(diffuse_path)
+        else:
+            diffuse_node.image = bpy.data.images[diffuse_name + ".dds"]
+        diffuse_node.image.colorspace_settings.name = 'Raw'
+    else:
+        print ("No Diffuse Node found.")
+
+def connect_specular(mat, specular_path, specular_name):
+    # Fetch Specular Node and connect file
+    if "_s GlossMap" in mat.material.node_tree.nodes:
+        specular_node = mat.material.node_tree.nodes["_s GlossMap"]
+        if specular_name + ".dds" not in bpy.data.images:
+            specular_node.image = bpy.data.images.load(specular_path)
+        else:
+            specular_node.image = bpy.data.images[specular_name + ".dds"]
+        specular_node.image.colorspace_settings.name = 'Raw'
+    else:
+        print("No Specular Node found.")
+
+def connect_normal(mat, normal_path, normal_name):
+    # Fetch Normal node and connect file
+    if "_n RotationMap" in mat.material.node_tree.nodes:
+        normal_node = mat.material.node_tree.nodes["_n RotationMap"]
+        if normal_name + ".dds" not in bpy.data.images:
+            normal_node.image = bpy.data.images.load(normal_path)
+        else:
+            normal_node.image = bpy.data.images[normal_name + ".dds"]
+        normal_node.image.colorspace_settings.name = 'Raw'
+    else:
+        print("No Normal Node found.")
 
 
 
