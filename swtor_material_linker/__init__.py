@@ -9,7 +9,7 @@ from . import uber_linker
 bl_info = {
     "name": "SWTOR Material Linker",
     "author": "Silver Ranger",
-    'version': (1, 2, 0),
+    'version': (2, 0, 0),
     "blender": (2, 80, 0),
     "category": "Import-Export",
 }
@@ -37,9 +37,11 @@ class OBJECT_MT_SubMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
 
-        layout.operator("object.material_match", text="Scene - Principled Shader")
-        layout.operator("object.uber_scene_match", text="Scene - Uber Material")
-        layout.operator("object.uber_active_match", text="Selected item - Uber Material")
+        layout.operator("object.material_match", text="Scene - Principled Shader (Legacy)")
+        layout.operator("object.uber_material_scene_match", text="Scene - Uber Material (Legacy)")
+        layout.operator("object.uber_material_active_match", text="Selected item - Uber Material (Legacy)")
+        layout.operator("object.uber_node_scene_match", text="Scene - Uber Material (Node)")
+        layout.operator("object.uber_node_active_match", text="Selected item - Uber Material (Node)")
 
 
 class OBJECT_MT_MainMenu(bpy.types.Menu):
@@ -56,8 +58,10 @@ class OBJECT_MT_MainMenu(bpy.types.Menu):
 def register():
     bpy.utils.register_class(LinkerAddonPreferences)
     bpy.utils.register_class(principled_linker.ObjectLinkMaterials)
-    bpy.utils.register_class(uber_linker.ObjectSceneUberLinker)
-    bpy.utils.register_class(uber_linker.ObjectActiveUberLinker)
+    bpy.utils.register_class(uber_linker.ObjectSceneUberMaterialLinker)
+    bpy.utils.register_class(uber_linker.ObjectActiveUberMaterialLinker)
+    bpy.utils.register_class(uber_linker.ObjectSceneUberNodeLinker)
+    bpy.utils.register_class(uber_linker.ObjectActiveUberNodeLinker)
     bpy.utils.register_class(OBJECT_MT_SubMenu)
     bpy.utils.register_class(OBJECT_MT_MainMenu)
     bpy.types.NODE_MT_context_menu.append(OBJECT_MT_MainMenu.draw)
@@ -67,6 +71,8 @@ def unregister():
     bpy.types.NODE_MT_context_menu.remove(OBJECT_MT_MainMenu.draw)
     bpy.utils.unregister_class(OBJECT_MT_MainMenu)
     bpy.utils.unregister_class(OBJECT_MT_SubMenu)
+    bpy.utils.unregister_class(uber_linker.ObjectActiveUberNodeLinker)
+    bpy.utils.unregister_class(uber_linker.ObjectSceneUberNodeLinker)
     bpy.utils.unregister_class(uber_linker.ObjectActiveUberLinker)
     bpy.utils.unregister_class(uber_linker.ObjectSceneUberLinker)
     bpy.utils.unregister_class(principled_linker.ObjectLinkMaterials)

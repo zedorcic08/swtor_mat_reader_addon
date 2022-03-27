@@ -92,6 +92,7 @@ def get_shader_info(filename):
     return [diffuse, normal, specular, uses_emissive, uses_reflective]
 
 
+# Function to erase the Principled BSDF node and then copy over the material template for the Uber Shade in its place
 def create_material_from_template(mat):
     # Fetch Principled BDSF node and delete it
     material_name = mat.material.name
@@ -119,41 +120,139 @@ def create_material_from_template(mat):
         print("Template not found.")
 
 
-def connect_diffuse(mat, diffuse_path, diffuse_name):
-    #0 Fetch Diffuse node and connect file
-    if "_d DiffuseMap" in mat.material.node_tree.nodes:
-        diffuse_node = mat.material.node_tree.nodes["_d DiffuseMap"]
-        if diffuse_name + ".dds" not in bpy.data.images:
-            diffuse_node.image = bpy.data.images.load(diffuse_path)
-        else:
-            diffuse_node.image = bpy.data.images[diffuse_name + ".dds"]
-        diffuse_node.image.colorspace_settings.name = 'Raw'
-    else:
-        print ("No Diffuse Node found.")
+#Function to delete the Principled BSDF node present and spawn a new SWTOR Uber Shader node.
+def create_material_node(mat):
 
-def connect_specular(mat, specular_path, specular_name):
+    # Fetch Principled BDSF node and delete it
+    material_name = mat.material.name
+    material_data = mat.material
+    print("--------------------")
+    print("Copying template for: " + material_name)
+
+    if "Principled BSDF" in material_data.node_tree.nodes:
+        print("Deleting default shader...")
+        principled_node = mat.material.node_tree.nodes["Principled BSDF"]
+        mat.material.node_tree.nodes.remove(principled_node)
+    else:
+        print("Principled Shader not present.")
+
+    print("Linking node...")
+
+    uber_node = mat.material.node_tree.nodes.new('ShaderNodeHeroEngine')
+    uber_node.derived = 'UBER'
+    uber_node.location = [-200, 100]
+
+    # Get output node already present
+    output_node = mat.material.node_tree.nodes["Material Output"]
+
+    # Link the two nodes
+    mat.material.node_tree.links.new(output_node.inputs['Surface'],uber_node.outputs['Shader'])
+
+
+def connect_diffuse(mat, diffuse_path, diffuse_name, operation_type):
+    # Fetch Diffuse node and connect file
+    if operation_type == 'legacy':
+        if "_d DiffuseMap" in mat.material.node_tree.nodes:
+            diffuse_node = mat.material.node_tree.nodes["_d DiffuseMap"]
+            if diffuse_name + ".dds" not in bpy.data.images:
+                diffuse_node.image = bpy.data.images.load(diffuse_path)
+            else:
+                diffuse_node.image = bpy.data.images[diffuse_name + ".dds"]
+            diffuse_node.image.colorspace_settings.name = 'Raw'
+        else:
+            print ("No Diffuse Node found.")
+    elif operation_type == 'node':
+        if 'SWTOR' in mat.material.node_tree.nodes:
+            material_node = mat.material.node_tree.nodes['SWTOR']
+            if diffuse_name + ".dds" not in bpy.data.images:
+                material_node.diffuseMap = bpy.data.images.load(diffuse_path)
+            else:
+                material_node.diffuseMap = bpy.data.images[diffuse_name + ".dds"]
+        else:
+            print("No node found.")
+    else:
+        print("Invalid Operation. ")
+
+
+def connect_specular(mat, specular_path, specular_name, operation_type):
     # Fetch Specular Node and connect file
-    if "_s GlossMap" in mat.material.node_tree.nodes:
-        specular_node = mat.material.node_tree.nodes["_s GlossMap"]
-        if specular_name + ".dds" not in bpy.data.images:
-            specular_node.image = bpy.data.images.load(specular_path)
+    if operation_type == 'legacy':
+        if "_s GlossMap" in mat.material.node_tree.nodes:
+            specular_node = mat.material.node_tree.nodes["_s GlossMap"]
+            if specular_name + ".dds" not in bpy.data.images:
+                specular_node.image = bpy.data.images.load(specular_path)
+            else:
+                specular_node.image = bpy.data.images[specular_name + ".dds"]
+            specular_node.image.colorspace_settings.name = 'Raw'
         else:
-            specular_node.image = bpy.data.images[specular_name + ".dds"]
-        specular_node.image.colorspace_settings.name = 'Raw'
+            print("No Specular Node found.")
+    elif operation_type == 'node':
+        if 'SWTOR' in mat.material.node_tree.nodes:
+            material_node = mat.material.node_tree.nodes['SWTOR']
+            if specular_name + ".dds" not in bpy.data.images:
+                material_node.glossMap = bpy.data.images.load(specular_path)
+            else:
+                material_node.glossMap = bpy.data.images[specular_name + ".dds"]
+        else:
+            print("No node found.")
     else:
-        print("No Specular Node found.")
+        print("Invalid Operation. ")
 
-def connect_normal(mat, normal_path, normal_name):
+
+def connect_normal(mat, normal_path, normal_name, operation_type):
     # Fetch Normal node and connect file
-    if "_n RotationMap" in mat.material.node_tree.nodes:
-        normal_node = mat.material.node_tree.nodes["_n RotationMap"]
-        if normal_name + ".dds" not in bpy.data.images:
-            normal_node.image = bpy.data.images.load(normal_path)
+    if operation_type == 'legacy':
+        if "_n RotationMap" in mat.material.node_tree.nodes:
+            normal_node = mat.material.node_tree.nodes["_n RotationMap"]
+            if normal_name + ".dds" not in bpy.data.images:
+                normal_node.image = bpy.data.images.load(normal_path)
+            else:
+                normal_node.image = bpy.data.images[normal_name + ".dds"]
+            normal_node.image.colorspace_settings.name = 'Raw'
         else:
-            normal_node.image = bpy.data.images[normal_name + ".dds"]
-        normal_node.image.colorspace_settings.name = 'Raw'
+            print("No Normal Node found.")
+    elif operation_type == 'node':
+        if 'SWTOR' in mat.material.node_tree.nodes:
+            material_node = mat.material.node_tree.nodes['SWTOR']
+            if normal_name + ".dds" not in bpy.data.images:
+                material_node.rotationMap = bpy.data.images.load(normal_path)
+            else:
+                material_node.rotationMap = bpy.data.images[normal_name + ".dds"]
+        else:
+            print("No node found.")
     else:
-        print("No Normal Node found.")
+        print("Invalid Operation. ")
+
+
+def connect_textures(mat, work_dir, component_list, operation_type):
+    if component_list[0] is not None:
+        diffuse_path = find_file(work_dir, component_list[0], 'texture')
+        if diffuse_path is not None:
+            connect_diffuse(mat, diffuse_path, component_list[0], operation_type)
+        else:
+            print("No diffuse texture found.")
+    else:
+        print("No diffuse data.")
+
+        # Get path of normal image and load into slot
+    if component_list[1] is not None:
+        normal_path = find_file(work_dir, component_list[1], 'texture')
+        if normal_path is not None:
+            connect_normal(mat, normal_path, component_list[1], operation_type)
+        else:
+            print("No normal texture found.")
+    else:
+        print("No normal data.")
+
+        # Get path to specular image and load into slot
+    if component_list[2] is not None:
+        specular_path = find_file(work_dir, component_list[2], 'texture')
+        if specular_path is not None:
+            connect_specular(mat, specular_path, component_list[2], operation_type)
+        else:
+            print("No specular texture found.")
+    else:
+        print("No specular data.")
 
 
 
