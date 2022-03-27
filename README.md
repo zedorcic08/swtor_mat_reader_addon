@@ -32,12 +32,6 @@ Once you import a model, switch over to the **Shading** view, and then right cli
 
 This add-on is suitable only for assets that contain non-wieldable items (furniture, decos, etc.) , architecture, environment, and vehicles. Nothing related to player characters is supported: weapons have been untested.
 
-### This is a **full scene** process.
-
-The add-on processes every model present on the scene. If you import characters alongside items, the character models will not have any textures, and, in fact, might lose those previously imported with it. 
-
-There is a feature planned to implement the functionality to work only on selected models in a scehe. ETA: about two weeks (from 2021-12-07).
-
 ### Change the default work directory
 
 Due to the fact my coding work is done on Windows, the default work directory has been set to C:\. Please change it for a faster look-up. Any look-ups done from the root of your drive is purely at your own risk (and at your patience): the look-up will take its time.
